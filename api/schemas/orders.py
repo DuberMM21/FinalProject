@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 from .order_details import OrderDetail
+from .payments import Payment
 
 
 
@@ -23,6 +24,7 @@ class Order(OrderBase):
     id: int
     order_date: Optional[datetime] = None
     order_details: list[OrderDetail] = None
+    payment: Payment
 
     class ConfigDict:
         from_attributes = True
