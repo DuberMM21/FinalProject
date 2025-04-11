@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String(120), unique=True, nullable=False)
     phone = Column(String(20), nullable=True)
     address = Column(String(255), nullable=True)
+    role = Column(String(20), nullable=False, server_default="customer")
 
     orders = relationship("Order", back_populates="customer")
     reviews = relationship("Review", back_populates="customer")

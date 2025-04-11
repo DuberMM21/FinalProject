@@ -9,6 +9,9 @@ from .payments import Payment
 class OrderBase(BaseModel):
     customer_id: int
     description: Optional[str] = None
+    order_status: str = "pending"
+    payment_status: str = "unpaid"
+    delivery_type: str = "pickup"
 
 
 class OrderCreate(OrderBase):
@@ -18,6 +21,9 @@ class OrderCreate(OrderBase):
 class OrderUpdate(BaseModel):
     customer_id: Optional[int] = None
     description: Optional[str] = None
+    order_status: Optional[str] = None
+    payment_status: Optional[str] = None
+    delivery_type: Optional[str] = None
 
 
 class Order(OrderBase):

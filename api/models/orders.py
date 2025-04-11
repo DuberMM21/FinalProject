@@ -12,6 +12,10 @@ class Order(Base):
     order_date = Column(DATETIME, nullable=False, server_default=str(datetime.now()))
     description = Column(String(300))
 
+    order_status = Column(String(20), nullable=False, server_default="pending")
+    payment_status = Column(String(20), nullable=False, server_default="unpaid")
+    delivery_type = Column(String(20), nullable=False, server_default="pickup")
+
     order_details = relationship("OrderDetail", back_populates="order")
     customer = relationship("User", back_populates="orders")
     reviews = relationship("Review", back_populates="order")
