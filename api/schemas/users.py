@@ -1,5 +1,12 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from enum import Enum
+
+class Role(str, Enum):
+    customer = "customer"
+    admin = "admin"
+    kitchen = "kitchen"
+    manager = "manager"
 
 # =========================
 # Shared Base Model
@@ -9,6 +16,7 @@ class UserBase(BaseModel):
     email: str
     phone: Optional[str] = None
     address: Optional[str] = None
+    role: Optional[str] = Role.customer
 
 # =========================
 # Schema for Creation
