@@ -2,6 +2,8 @@
 
 from fastapi import FastAPI
 from api.controllers import users, payments
+from api.routers import menu
+
 
 app = FastAPI()
 
@@ -12,3 +14,5 @@ def read_root():
 # Include your routers
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(payments.router, prefix="/payments", tags=["Payments"])
+app.include_router(menu.router, prefix="/menu", tags=["Menu"])
+
