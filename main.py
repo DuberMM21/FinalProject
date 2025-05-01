@@ -1,5 +1,3 @@
-# main.py
-
 from fastapi import FastAPI
 from api.routers import index
 
