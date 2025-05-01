@@ -1,42 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..schemas.payments import PaymentCreate, Payment
-from ..models import payments as models
-from ..dependencies import get_db
+from ..models.payments import Payment
+from ..schemas.payments import PaymentCreate
 
-router = APIRouter()
-
-@router.post("/payments/", response_model=Payment)
-def create_payment(payment: PaymentCreate, db: Session = Depends(get_db)):
-    db_payment = models.Payment(**payment.dict())
+def create(db: Session, payment: PaymentCreate):
+    db_payment = Payment(**payment.dict())
     db.add(db_payment)
     db.commit()
     db.refresh(db_payment)
     return db_payment
 
-@router.get("/payments/{payment_id}", response_model=Payment)
-def read_payment(payment_id: int, db: Session = Depends(get_db)):
-    payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
-    return payment
+def read_all(db: Session):
+    return db.query(Payment).all()
 
-@router.put("/payments/{payment_id}", response_model=Payment)
-def update_payment(payment_id: int, updated_payment: PaymentCreate, db: Session = Depends(get_db)):
-    payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
-    for key, value in updated_payment.dict().items():
-        setattr(payment, key, value)
-    db.commit()
-    db.refresh(payment)
-    return payment
+def read_one(db: Session, payment_id: int):
+    return db.query(Payment).filter(Payment.id == payment_id).first()
 
-@router.delete("/payments/{payment_id}")
-def delete_payment(payment_id: int, db: Session = Depends(get_db)):
-    payment = db.query(models.Payment).filter(models.Payment.id == payment_id).first()
-    if not payment:
-        raise HTTPException(status_code=404, detail="Payment not found")
-    db.delete(payment)
-    db.commit()
-    return {"detail": "Payment deleted successfully"}
+def update(db: Session, payment_id: int, payment: PaymentCreate):
+    db_payment = db.query(Payment).filter(Payment.id == payment_id).first()
+    if db_payment:
+        for field, value in payment.dict().items():
+            setattr(db_payment, field, value)
+        db.commit()
+        db.refresh(db_payment)
+    return db_payment
+
+def delete(db: Session, payment_id: int):
+    db_payment = db.query(Payment).filter(Payment.id == payment_id).first()
+    if db_payment:
+        db.delete(db_payment)
+        db.commit()
+    return {"message": "Payment deleted"}
