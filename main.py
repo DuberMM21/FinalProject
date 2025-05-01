@@ -3,11 +3,9 @@ from api.dependencies.database import Base, engine
 import api.models.menu
 
 
-from api.routers import menu
+from api.routers import users, menu, promotions
 from pydantic import BaseModel
 from sqlalchemy import create_engine
-from fastapi import FastAPI
-from api.routers import index
 
 app = FastAPI()
 
@@ -18,7 +16,5 @@ def read_root():
 Base.metadata.create_all(bind=engine)
 
 app.include_router(menu.router)
-
-
-# Load all routers from index.py
-index.load_routes(app)
+app.include_router(promotions.router)
+app.include_router(users.router)

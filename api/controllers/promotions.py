@@ -1,46 +1,51 @@
-from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from ..dependencies.database import get_db
-from ..models import promotions as models
-from ..schemas import promotions as schemas
+from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
+from ..models import promotions as model
+from ..schemas import promotions as schema
+from datetime import datetime
 
-router = APIRouter()
 
-@router.post("/", response_model=schemas.Promotion)
-def create_promotion(promotion: schemas.PromotionCreate, db: Session = Depends(get_db)):
-    db_promotion = models.Promotion(**promotion.dict())
-    db.add(db_promotion)
-    db.commit()
-    db.refresh(db_promotion)
-    return db_promotion
+def create_promotion(db: Session, request: schema.PromotionCreate):
+    new_promo = model.Promotion(
+        code=request.code,
+        expiration_date=request.expiration_date
+    )
 
-@router.get("/", response_model=list[schemas.Promotion])
-def get_promotions(db: Session = Depends(get_db)):
-    return db.query(models.Promotion).all()
+    try:
+        db.add(new_promo)
+        db.commit()
+        db.refresh(new_promo)
+    except SQLAlchemyError as e:
+        error = str(e.__dict__["orig"])
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
 
-@router.get("/{promotion_id}", response_model=schemas.Promotion)
-def get_promotion(promotion_id: int, db: Session = Depends(get_db)):
-    promotion = db.query(models.Promotion).filter(models.Promotion.id == promotion_id).first()
-    if not promotion:
+    return new_promo
+
+
+def get_promotions(db: Session):
+    try:
+        return db.query(model.Promotion).all()
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+def get_promotion_by_code(db: Session, code: str):
+    promo = db.query(model.Promotion).filter(model.Promotion.code == code).first()
+    if not promo:
         raise HTTPException(status_code=404, detail="Promotion not found")
-    return promotion
+    return promo
 
-@router.put("/{promotion_id}", response_model=schemas.Promotion)
-def update_promotion(promotion_id: int, updated_promotion: schemas.PromotionCreate, db: Session = Depends(get_db)):
-    promotion = db.query(models.Promotion).filter(models.Promotion.id == promotion_id).first()
-    if not promotion:
-        raise HTTPException(status_code=404, detail="Promotion not found")
-    for key, value in updated_promotion.dict().items():
-        setattr(promotion, key, value)
-    db.commit()
-    db.refresh(promotion)
-    return promotion
 
-@router.delete("/{promotion_id}")
-def delete_promotion(promotion_id: int, db: Session = Depends(get_db)):
-    promotion = db.query(models.Promotion).filter(models.Promotion.id == promotion_id).first()
-    if not promotion:
+def delete_promotion(db: Session, promo_id: int):
+    promo = db.query(model.Promotion).filter(model.Promotion.id == promo_id).first()
+    if not promo:
         raise HTTPException(status_code=404, detail="Promotion not found")
-    db.delete(promotion)
-    db.commit()
-    return {"detail": "Promotion deleted successfully"}
+
+    try:
+        db.delete(promo)
+        db.commit()
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {"detail": "Promotion deleted"}

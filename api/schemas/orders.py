@@ -12,6 +12,7 @@ class OrderBase(BaseModel):
     order_status: str = "pending"
     payment_status: str = "unpaid"
     delivery_type: str = "pickup"
+    promotion_id: Optional[int] = None
 
 
 class OrderCreate(OrderBase):
