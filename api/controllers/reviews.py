@@ -1,23 +1,14 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status, Response, Depends
+from fastapi import HTTPException, status, Response
 from ..models import reviews as model
 from sqlalchemy.exc import SQLAlchemyError
 
-#    id = Column(Integer, primary_key=True, index=True)
-#     rating = Column(Integer, nullable=False)  # Expected range: 1 to 5
-#     text = Column(String(500), nullable=True)
-#     customer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-#     order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
-
-#     customer = relationship("User", back_populates="reviews")
-#     order = relationship("Order", back_populates="reviews")
-
 def create(db: Session, request):
     new_item = model.Review(
-        rating = request.rating,
-        text = request.text,
-        customer_id = request.customer_id,
-        order_id = request.order_id
+        rating=request.rating,
+        text=request.text,
+        customer_id=request.customer_id,
+        order_id=request.order_id
     )
 
     try:
@@ -29,7 +20,6 @@ def create(db: Session, request):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return new_item
 
-
 def read_all(db: Session):
     try:
         result = db.query(model.Review).all()
@@ -37,7 +27,6 @@ def read_all(db: Session):
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return result
-
 
 def read_one(db: Session, item_id):
     try:
@@ -48,7 +37,6 @@ def read_one(db: Session, item_id):
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return item
-
 
 def update(db: Session, item_id, request):
     try:
@@ -62,8 +50,6 @@ def update(db: Session, item_id, request):
         error = str(e.__dict__['orig'])
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
     return item.first()
-
-
 
 def delete(db: Session, item_id):
     try:
