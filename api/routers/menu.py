@@ -4,7 +4,7 @@ from ..schemas.menu import Menu, MenuCreate
 from ..dependencies import get_db
 from ..controllers.menu import create, read_all, read_one, update, delete
 
-router = APIRouter()
+router = APIRouter(prefix="/menu", tags=["Menu"])
 
 @router.post("/", response_model=Menu)
 def create_menu_item(menu: MenuCreate, db: Session = Depends(get_db)):

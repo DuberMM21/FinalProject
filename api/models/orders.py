@@ -15,8 +15,10 @@ class Order(Base):
     order_status = Column(String(20), nullable=False, server_default="pending")
     payment_status = Column(String(20), nullable=False, server_default="unpaid")
     delivery_type = Column(String(20), nullable=False, server_default="pickup")
+    promotion_id = Column(Integer, ForeignKey("promotions.id"), nullable=True)
 
     order_details = relationship("OrderDetail", back_populates="order")
     customer = relationship("User", back_populates="orders")
     reviews = relationship("Review", back_populates="order")
     payment = relationship("Payment", back_populates="order", uselist=False)
+    promotion = relationship("Promotion", back_populates="order")

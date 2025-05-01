@@ -3,14 +3,25 @@ from ..models.menu import Menu
 from ..schemas.menu import MenuCreate
 
 def create(db: Session, menu: MenuCreate):
+
+    existing_menu = db.query(Menu).filter(Menu.name == menu.name).first()
+    if existing_menu:
+        print(f"Menu item with name {menu.name} already exists")
+        return existing_menu
+
     db_menu = Menu(
         name=menu.name,
         description=menu.description,
         price=menu.price,
     )
+    print(f"Created Menu: {db_menu}")
+
     db.add(db_menu)
     db.commit()
     db.refresh(db_menu)
+
+    print(f"Menu after commit: {db_menu}")
+
     return db_menu
 
 def read_all(db: Session):

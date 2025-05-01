@@ -6,3 +6,4 @@ def load_routes(app):
     app.include_router(menu.router)
     app.include_router(users.router)
     app.include_router(payments.router)
+
