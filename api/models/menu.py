@@ -8,7 +8,7 @@ class Menu(Base):
     __tablename__ = "menu"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
     description = Column(String(300))
     price = Column(DECIMAL(10,2), nullable=False)
 

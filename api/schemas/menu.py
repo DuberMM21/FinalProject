@@ -3,15 +3,12 @@ from typing import Optional
 
 ...
 
-class MenuBase(BaseModel):
+class MenuCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
 
-class MenuCreate(MenuBase):
-    id: int
-
-class Menu(MenuBase):
+class Menu(MenuCreate):
     id: int
 
     class Config:
