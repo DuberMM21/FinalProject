@@ -1,46 +1,43 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from ..dependencies.database import get_db
-from ..models import recipes as models
-from ..schemas import recipes as schemas
+from sqlalchemy.exc import SQLAlchemyError
+from api.models.recipe import Recipe
+from api.schemas.recipe import RecipeCreate
 
-router = APIRouter()
+def create(db: Session, item: RecipeCreate):
+    new_item = Recipe(**item.model_dump())
+    try:
+        db.add(new_item)
+        db.commit()
+        db.refresh(new_item)
+        return new_item
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/", response_model=schemas.Recipe)
-def create_recipe(recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
-    db_recipe = models.Recipe(**recipe.dict())
-    db.add(db_recipe)
-    db.commit()
-    db.refresh(db_recipe)
-    return db_recipe
+def read_all(db: Session):
+    return db.query(Recipe).all()
 
-@router.get("/", response_model=list[schemas.Recipe])
-def get_recipes(db: Session = Depends(get_db)):
-    return db.query(models.Recipe).all()
-
-@router.get("/{recipe_id}", response_model=schemas.Recipe)
-def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
-    if not recipe:
+def read_one(db: Session, item_id: int):
+    item = db.query(Recipe).filter(Recipe.id == item_id).first()
+    if not item:
         raise HTTPException(status_code=404, detail="Recipe not found")
-    return recipe
+    return item
 
-@router.put("/{recipe_id}", response_model=schemas.Recipe)
-def update_recipe(recipe_id: int, updated_recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
-    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
-    if not recipe:
+def update(db: Session, item_id: int, item: RecipeCreate):
+    db_item = db.query(Recipe).filter(Recipe.id == item_id).first()
+    if not db_item:
         raise HTTPException(status_code=404, detail="Recipe not found")
-    for key, value in updated_recipe.dict().items():
-        setattr(recipe, key, value)
+    for field, value in item.model_dump().items():
+        setattr(db_item, field, value)
     db.commit()
-    db.refresh(recipe)
-    return recipe
+    db.refresh(db_item)
+    return db_item
 
-@router.delete("/{recipe_id}")
-def delete_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
-    if not recipe:
+def delete(db: Session, item_id: int):
+    db_item = db.query(Recipe).filter(Recipe.id == item_id).first()
+    if not db_item:
         raise HTTPException(status_code=404, detail="Recipe not found")
-    db.delete(recipe)
+    db.delete(db_item)
     db.commit()
-    return {"detail": "Recipe deleted successfully"}
+    return {"message": "Recipe deleted successfully"}

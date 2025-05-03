@@ -1,4 +1,4 @@
-class conf:
+class Config:
     db_host = "localhost"
     db_name = "final_sandwich_maker_api"
     db_port = 3306

@@ -1,50 +1,45 @@
+# controllers/menu.py
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from ..models.menu import Menu
-from ..schemas.menu import MenuCreate
+from sqlalchemy.exc import SQLAlchemyError
 
-def create(db: Session, menu: MenuCreate):
+from api.models.menu import Menu as MenuModel
+from api.schemas.menu import MenuCreate
 
-    existing_menu = db.query(Menu).filter(Menu.name == menu.name).first()
-    if existing_menu:
-        print(f"Menu item with name {menu.name} already exists")
-        return existing_menu
+def create(db: Session, item: MenuCreate):
+    new_item = MenuModel(**item.model_dump())
+    try:
+        db.add(new_item)
+        db.commit()
+        db.refresh(new_item)
+        return new_item
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
-    db_menu = Menu(
-        name=menu.name,
-        description=menu.description,
-        price=menu.price,
-    )
-    print(f"Created Menu: {db_menu}")
+def read_all(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(MenuModel).offset(skip).limit(limit).all()
 
-    db.add(db_menu)
+def read_one(db: Session, item_id: int):
+    item = db.query(MenuModel).filter(MenuModel.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="Menu item not found")
+    return item
+
+def update(db: Session, item_id: int, item: MenuCreate):
+    existing = db.query(MenuModel).filter(MenuModel.id == item_id).first()
+    if existing is None:
+        raise HTTPException(status_code=404, detail="Menu item not found")
+    for key, value in item.model_dump().items():
+        setattr(existing, key, value)
     db.commit()
-    db.refresh(db_menu)
+    db.refresh(existing)
+    return existing
 
-    print(f"Menu after commit: {db_menu}")
-
-    return db_menu
-
-def read_all(db: Session):
-    return db.query(Menu).all()
-
-def read_one(db: Session, menu_id: int):
-    return db.query(Menu).filter(Menu.id == menu_id).first()
-
-def update(db: Session, menu_id: int, menu: MenuCreate):
-    db_menu = db.query(Menu).filter(Menu.id == menu_id).first()
-    if db_menu:
-        db_menu.name = menu.name
-        db_menu.description = menu.description
-        db_menu.price = menu.price
-        db.commit()
-        db.refresh(db_menu)
-        return db_menu
-    return None
-
-def delete(db: Session, menu_id: int):
-    db_menu = db.query(Menu).filter(Menu.id == menu_id).first()
-    if db_menu:
-        db.delete(db_menu)
-        db.commit()
-        return {"detail": "Menu item deleted successfully"}
-    return {"detail": "Menu item not found"}
+def delete(db: Session, item_id: int):
+    item = db.query(MenuModel).filter(MenuModel.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="Menu item not found")
+    db.delete(item)
+    db.commit()
+    return {"message": "Menu item deleted successfully"}

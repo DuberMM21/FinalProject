@@ -1,15 +1,6 @@
-from . import orders, order_details, recipes, sandwiches, resources, users, reviews, payments, promotions
+# models/model_loader.py
 
-from ..dependencies.database import engine
+# noqa: F401
 
-
-def index():
-    orders.Base.metadata.create_all(engine)
-    order_details.Base.metadata.create_all(engine)
-    recipes.Base.metadata.create_all(engine)
-    sandwiches.Base.metadata.create_all(engine)
-    resources.Base.metadata.create_all(engine)
-    users.Base.metadata.create_all(engine)
-    reviews.Base.metadata.create_all(engine)
-    payments.Base.metadata.create_all(engine)
-    promotions.Base.metadata.create_all(engine)
+# This file ensures that all models are imported so SQLAlchemy can discover them.
+# No code logic needed here unless automating model registration dynamically.

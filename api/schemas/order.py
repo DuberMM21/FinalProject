@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 
-class MenuBase(BaseModel):
-    name: str
+class OrderBase(BaseModel):
+    customer_name: str
     description: str
-    price: float
 
-class MenuCreate(MenuBase):
+class OrderCreate(OrderBase):
     pass
 
-class Menu(MenuBase):
+class Order(OrderBase):
     id: int
 
     class Config:

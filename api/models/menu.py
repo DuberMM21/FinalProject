@@ -1,15 +1,13 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, DECIMAL, DATETIME
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from ..dependencies.database import Base
-
 
 class Menu(Base):
     __tablename__ = "menu"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
-    description = Column(String(300))
-    price = Column(DECIMAL(10,2), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    price = Column(Float, nullable=False)
 
-
+    sandwiches = relationship("Sandwich", back_populates="menu")

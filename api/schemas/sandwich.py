@@ -1,14 +1,17 @@
 from pydantic import BaseModel
 
-class MenuBase(BaseModel):
+class SandwichBase(BaseModel):
     name: str
     description: str
+    ingredients: str
     price: float
+    available: bool
+    menu_id: int
 
-class MenuCreate(MenuBase):
+class SandwichCreate(SandwichBase):
     pass
 
-class Menu(MenuBase):
+class Sandwich(SandwichBase):
     id: int
 
     class Config:
