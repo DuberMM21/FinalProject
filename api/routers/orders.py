@@ -4,7 +4,7 @@ from api.controllers import orders as controller
 from api.schemas import order as schema
 from api.dependencies.database import get_db
 
-router = APIRouter(prefix="/orders", tags=["orders"])
+router = APIRouter()
 
 @router.post("/", response_model=schema.Order)
 def create_order(order: schema.OrderCreate, db: Session = Depends(get_db)):
