@@ -6,9 +6,9 @@ class Sandwich(Base):
     __tablename__ = "sandwiches"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String)
-    ingredients = Column(String)
+    name = Column(String(100), nullable=False)
+    description = Column(String(200))
+    ingredients = Column(String(200))
     price = Column(Float, nullable=False)
     available = Column(Boolean, default=True)
 

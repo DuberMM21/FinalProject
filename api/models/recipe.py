@@ -5,8 +5,8 @@ class Recipe(Base):
     __tablename__ = "recipes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String)
-    ingredients = Column(String, nullable=False)
-    instructions = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(String(200))
+    ingredients = Column(String(200), nullable=False)
+    instructions = Column(String(200), nullable=False)
     vegetarian = Column(Boolean, default=False)
