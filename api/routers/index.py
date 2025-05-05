@@ -10,7 +10,7 @@ router = APIRouter()
 
 def load_routes(app):
     app.include_router(menu_router, prefix="/menu", tags=["Menu"])
-    app.include_router(order_details_router, prefix="/order-details", tags=["Order Details"])
+    app.include_router(order_details_router, prefix="/order-details", tags=["Kitchen Dashboard"])
     app.include_router(orders_router, prefix="/orders", tags=["Orders"])
     app.include_router(payments_router, prefix="/payments", tags=["Payments"])
     app.include_router(users_router, prefix="/users", tags=["Users"])
