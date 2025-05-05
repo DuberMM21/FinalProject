@@ -11,3 +11,6 @@
 `uvicorn api.main:app --reload`
 ### Test API by built-in docs:
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+VIDEO LINK:
+https://drive.google.com/file/d/1gQO3iACcvdQTLrAbIQZnDrmspYGDm4sP/view?usp=sharing
